@@ -9,10 +9,12 @@ Build math confidence through short, focused practice sessions that adapt to the
 ## How it works
 
 **Two personas:**
+
 - **Curator** — adds topics, reviews AI-generated sessions, monitors progress. All via CLI.
 - **Learner** — opens the app, works through a 10-15 minute session, earns points and levels. Always moves forward.
 
 **The loop:**
+
 1. Curator adds a topic → AI breaks it into concepts with prerequisites
 2. Planner generates a session (complete HTML with exercises, hints, feedback) → Curator reviews and approves
 3. Learner completes the session → results flow to Firestore
@@ -52,6 +54,7 @@ The app is built around the idea that learning works best when it respects how a
 ## Pedagogy
 
 Built on Matt Pocock's [teach skill](https://github.com/mattpocock/skills) philosophy:
+
 - Mission-grounded learning tied to real goals
 - Zone of Proximal Development — always challenged just enough
 - Storage strength over fluency — spaced repetition, retrieval practice
