@@ -21,4 +21,4 @@ jobs:
           cache-dependency-path: backend/go.sum
       - run: npm ci
       - run: make ci
-      - run: make test-integration-ci
+      - run: make test-integration
