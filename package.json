@@ -12,6 +12,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.5.0",
+    "firebase-tools": "^15.20.0",
     "globals": "^17.6.0",
     "prettier": "^3.8.4"
   }

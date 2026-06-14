@@ -1,4 +1,4 @@
-.PHONY: lint lint-fix format format-check serve ci
+.PHONY: lint lint-fix format format-check serve ci build test test-integration go-vet go-lint
 
 lint:
 	npx eslint --no-error-on-unmatched-pattern '**/*.js'
@@ -15,4 +15,21 @@ format-check:
 serve:
 	python3 -m http.server 8000
 
-ci: lint format-check
+build:
+	cd backend && go build ./cmd/mathilde
+
+test:
+	cd backend && go test ./...
+
+FIRESTORE_PROJECT ?= mathilde-61d77
+
+test-integration:
+	npx firebase emulators:exec --only firestore --project $(FIRESTORE_PROJECT) \
+		'cd backend && FIRESTORE_EMULATOR_HOST=localhost:8080 go test ./... -v -count=1'
+
+go-vet:
+	cd backend && go vet ./...
+
+go-lint: go-vet
+
+ci: lint format-check go-vet test
