@@ -1,4 +1,4 @@
-.PHONY: lint lint-fix format format-check serve ci build test test-integration go-vet go-lint
+.PHONY: lint lint-fix format format-check serve ci build test test-integration test-integration-ci go-vet go-lint
 
 lint:
 	npx eslint --no-error-on-unmatched-pattern '**/*.js'
@@ -23,6 +23,12 @@ test:
 
 test-integration:
 	cd backend && FIRESTORE_EMULATOR_HOST=localhost:8080 go test ./... -v -count=1
+
+test-integration-ci:
+	npx firebase emulators:exec --only firestore --project $(FIRESTORE_PROJECT) \
+		'cd backend && FIRESTORE_EMULATOR_HOST=localhost:8080 go test ./... -v -count=1'
+
+FIRESTORE_PROJECT ?= mathilde-61d77
 
 go-vet:
 	cd backend && go vet ./...
