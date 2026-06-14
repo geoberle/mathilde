@@ -6,3 +6,7 @@ node_modules/
 # Go
 backend/mathilde
 *.exe
+
+# Firebase emulator
+firestore-debug.log
+ui-debug.log
