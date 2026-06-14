@@ -1,6 +1,6 @@
 # Mathilde
 
-Adaptive math learning app that grows with the learner.
+An adaptive math learning app that grows with the learner.
 
 ## Mission
 
@@ -11,14 +11,14 @@ Build math confidence through short, focused practice sessions that adapt to the
 **Two personas:**
 
 - **Curator** — adds topics, reviews AI-generated sessions, monitors progress. All via CLI.
-- **Learner** — opens the app, works through a 10-15 minute session, earns points and levels. Always moves forward.
+- **Learner** — opens the app, works through a 10-15-minute session, earns points and levels. Always moves forward.
 
 **The loop:**
 
 1. Curator adds a topic → AI breaks it into concepts with prerequisites
 2. Planner generates a session (complete HTML with exercises, hints, feedback) → Curator reviews and approves
-3. Learner completes the session → results flow to Firestore
-4. AI analyzes results, updates learning records with what the learner knows and where they struggle
+3. Learner completes the session → results flow into Firestore
+4. AI analyzes results and updates learning records with what the learner knows and where the learner struggles
 5. Planner uses updated records to generate the next session at the right difficulty
 6. Repeat
 
@@ -45,7 +45,7 @@ Go backend (home machine)
 
 The app is built around the idea that learning works best when it respects how attention and memory actually work:
 
-- **Short sessions** — 10-15 minutes of focused practice beats an hour of drifting attention. The learner can keep going if they're in the zone.
+- **Short sessions** — 10-15 minutes of focused practice beats an hour of drifting attention. Learners can keep going if they're in the zone.
 - **Forward-only progress** — points and levels only go up. A bad day doesn't erase progress. Showing up and trying always counts.
 - **Scaffolding over failure** — every exercise has a hint chain that progressively simplifies the problem. The learner always arrives at understanding — sometimes with more support, sometimes less.
 - **Low cognitive load** — progress bars show remaining effort, layouts are clean, feedback is immediate. No text walls, no clutter.
