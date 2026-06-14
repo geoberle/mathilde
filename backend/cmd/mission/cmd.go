@@ -6,6 +6,8 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/spf13/cobra"
+
+	"github.com/geoberle/mathilde/backend/model"
 )
 
 func NewCommand() (*cobra.Command, error) {
@@ -48,19 +50,21 @@ func runGet(ctx context.Context, opts *RawMissionOptions) error {
 	if err != nil {
 		return err
 	}
-	defer completed.Options.Close()
+	defer completed.Close()
 
-	snap, err := completed.Options.Store.ProfileDoc(completed.Options.UID).Get(ctx)
+	snap, err := completed.Store.ProfileDoc(completed.UID).Get(ctx)
 	if err != nil {
 		return fmt.Errorf("reading profile: %w", err)
 	}
-	data := snap.Data()
-	mission, _ := data["mission"].(string)
-	if len(mission) == 0 {
+	var p model.Profile
+	if err := snap.DataTo(&p); err != nil {
+		return fmt.Errorf("decoding profile: %w", err)
+	}
+	if len(p.Mission) == 0 {
 		fmt.Println("No mission set.")
 		return nil
 	}
-	fmt.Println(mission)
+	fmt.Println(p.Mission)
 	return nil
 }
 
@@ -95,9 +99,9 @@ func runSet(ctx context.Context, opts *RawMissionOptions, text string) error {
 	if err != nil {
 		return err
 	}
-	defer completed.Options.Close()
+	defer completed.Close()
 
-	_, err = completed.Options.Store.ProfileDoc(completed.Options.UID).Set(ctx, map[string]any{
+	_, err = completed.Store.ProfileDoc(completed.UID).Set(ctx, map[string]any{
 		"mission": text,
 	}, firestore.MergeAll)
 	if err != nil {

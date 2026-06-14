@@ -1,0 +1,31 @@
+version: "2"
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+linters:
+  exclusions:
+    presets:
+      - std-error-handling
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+formatters:
+  enable:
+    - gci
+    - gofmt
+  settings:
+    gci:
+      custom-order: true
+      sections:
+        - standard
+        - blank
+        - dot
+        - default
+        - prefix(github.com/geoberle/mathilde)

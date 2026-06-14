@@ -31,12 +31,12 @@ func run(ctx context.Context, opts *RawPingOptions) error {
 	if err != nil {
 		return err
 	}
-	defer completed.Options.Close()
+	defer completed.Close()
 	return completed.Execute(ctx)
 }
 
 func (o *PingOptions) Execute(ctx context.Context) error {
-	doc := o.Options.Store.Doc(o.Options.UID, "ping", "test")
+	doc := o.Store.Doc(o.UID, "ping", "test")
 	now := time.Now().UTC()
 
 	_, err := doc.Set(ctx, map[string]any{

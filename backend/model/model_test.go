@@ -1,12 +1,12 @@
 package model_test
 
 import (
+	"context"
 	"os"
 	"testing"
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"context"
 
 	"github.com/geoberle/mathilde/backend/model"
 	"github.com/geoberle/mathilde/backend/store"
@@ -44,7 +44,7 @@ func TestLearningRecordRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("writing learning record: %v", err)
 	}
-	defer doc.Delete(ctx)
+	defer func() { _, _ = doc.Delete(ctx) }()
 	defer client.Close()
 
 	snap, err := doc.Get(ctx)
@@ -89,7 +89,7 @@ func TestProfileRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("writing profile: %v", err)
 	}
-	defer doc.Delete(ctx)
+	defer func() { _, _ = doc.Delete(ctx) }()
 	defer client.Close()
 
 	snap, err := doc.Get(ctx)

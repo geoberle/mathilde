@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"cloud.google.com/go/firestore"
+
 	"github.com/geoberle/mathilde/backend/store"
 )
 
