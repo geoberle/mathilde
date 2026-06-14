@@ -14,9 +14,9 @@
     userInfo.innerHTML = "";
     app.innerHTML =
       '<div class="welcome-anon">' +
-        '<p class="welcome-tagline">Deine Mathe-Lernapp</p>' +
-        '<button class="sign-in-btn" id="sign-in-btn">Mit Google anmelden</button>' +
-      '</div>';
+      '<p class="welcome-tagline">Deine Mathe-Lernapp</p>' +
+      '<button class="sign-in-btn" id="sign-in-btn">Mit Google anmelden</button>' +
+      "</div>";
     document.getElementById("sign-in-btn").addEventListener("click", function () {
       window.mathilde.signInWithGoogle().catch(function (err) {
         if (err.code !== "auth/popup-closed-by-user") {
@@ -30,15 +30,19 @@
     var displayName = user.displayName || "Lernende";
 
     userInfo.innerHTML =
-      '<span class="user-name">' + esc(displayName) + '</span>' +
+      '<span class="user-name">' +
+      esc(displayName) +
+      "</span>" +
       '<button class="sign-out-btn" id="sign-out-btn">Abmelden</button>';
 
     app.innerHTML =
       '<div class="welcome">' +
-        '<h2>Hallo, ' + esc(displayName.split(" ")[0]) + '!</h2>' +
-        '<p class="welcome-sub">Keine Sessions verfügbar. Dein Curator bereitet neue Inhalte vor.</p>' +
-        '<div class="stats" id="stats"></div>' +
-      '</div>';
+      "<h2>Hallo, " +
+      esc(displayName.split(" ")[0]) +
+      "!</h2>" +
+      '<p class="welcome-sub">Keine Sessions verfügbar. Dein Curator bereitet neue Inhalte vor.</p>' +
+      '<div class="stats" id="stats"></div>' +
+      "</div>";
 
     document.getElementById("sign-out-btn").addEventListener("click", function () {
       window.mathilde.signOut();
@@ -49,13 +53,19 @@
       if (!statsEl) return;
       statsEl.innerHTML =
         '<div class="stat">' +
-          '<span class="stat-label">Level</span>' +
-          '<span class="stat-value">' + profile.level + '</span>' +
-        '</div>' +
+        '<span class="stat-label">Level</span>' +
+        '<span class="stat-value">' +
+        profile.level +
+        "</span>" +
+        "</div>" +
         '<div class="stat">' +
-          '<span class="stat-label">XP</span>' +
-          '<span class="stat-value">' + profile.xp + ' / ' + window.mathilde.xpForLevel(profile.level) + '</span>' +
-        '</div>';
+        '<span class="stat-label">XP</span>' +
+        '<span class="stat-value">' +
+        profile.xp +
+        " / " +
+        window.mathilde.xpForLevel(profile.level) +
+        "</span>" +
+        "</div>";
     });
   }
 

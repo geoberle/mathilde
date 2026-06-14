@@ -7,7 +7,7 @@
     projectId: "mathilde-61d77",
     storageBucket: "mathilde-61d77.firebasestorage.app",
     messagingSenderId: "457178130197",
-    appId: "1:457178130197:web:29c3d76fdacf538a0fab1c"
+    appId: "1:457178130197:web:29c3d76fdacf538a0fab1c",
   };
 
   firebase.initializeApp(config);
@@ -36,7 +36,7 @@
   }
 
   function xpForLevel(level) {
-    return 100 + (level * 20);
+    return 100 + level * 20;
   }
 
   window.mathilde = {
@@ -59,11 +59,16 @@
     getProfile: function () {
       var doc = profileDoc();
       if (!doc) return Promise.resolve({ xp: 0, level: 1 });
-      return doc.get().then(function (snap) {
-        if (!snap.exists) return { xp: 0, level: 1 };
-        var d = snap.data();
-        return { xp: d.xp || 0, level: d.level || 1 };
-      }).catch(function () { return { xp: 0, level: 1 }; });
+      return doc
+        .get()
+        .then(function (snap) {
+          if (!snap.exists) return { xp: 0, level: 1 };
+          var d = snap.data();
+          return { xp: d.xp || 0, level: d.level || 1 };
+        })
+        .catch(function () {
+          return { xp: 0, level: 1 };
+        });
     },
 
     addXP: function (amount) {
@@ -81,24 +86,24 @@
             newLevel++;
           }
           tx.set(doc, { xp: newXP, level: newLevel }, { merge: true });
-          return { oldLevel: currentLevel, newLevel: newLevel, xp: newXP, leveledUp: newLevel > currentLevel };
+          return {
+            oldLevel: currentLevel,
+            newLevel: newLevel,
+            xp: newXP,
+            leveledUp: newLevel > currentLevel,
+          };
         });
       });
     },
 
     xpForLevel: xpForLevel,
 
-    submitAnswer: function (exerciseId, result) {
-      // Bridge API stub — sessions will call this
-    },
+    submitAnswer: function (_exerciseId, _result) {},
 
-    sessionComplete: function (summary) {
-      // Bridge API stub — sessions will call this
-    },
+    sessionComplete: function (_summary) {},
 
-    requestEvaluation: function (imageData) {
-      // Bridge API stub — handwriting evaluation (post-MVP)
+    requestEvaluation: function (_imageData) {
       return Promise.resolve(null);
-    }
+    },
   };
 })();
