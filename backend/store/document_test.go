@@ -149,6 +149,25 @@ func TestReplaceConflict(t *testing.T) {
 	}
 }
 
+func TestReplaceNotFound(t *testing.T) {
+	client := newTestClient(t)
+	defer client.Close()
+	ctx := context.Background()
+
+	ref := client.Collection("users").Doc("test-crud-replace-notfound").Collection("profile").Doc("main")
+
+	doc := &store.Document[model.Profile]{
+		ID:         "main",
+		Data:       model.Profile{Mission: "Ghost"},
+		UpdateTime: time.Now(),
+	}
+
+	_, err := store.Replace(ctx, ref, doc)
+	if !errors.Is(err, store.ErrNotFound) {
+		t.Fatalf("expected ErrNotFound, got: %v", err)
+	}
+}
+
 func TestList(t *testing.T) {
 	client := newTestClient(t)
 	defer client.Close()

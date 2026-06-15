@@ -2,10 +2,14 @@ package store
 
 import (
 	"context"
+	"regexp"
 	"strings"
 
 	"github.com/geoberle/mathilde/backend/model"
 )
+
+var nonAlphanumericHyphen = regexp.MustCompile(`[^a-z0-9-]`)
+var multipleHyphens = regexp.MustCompile(`-{2,}`)
 
 const topicsCollection = "topics"
 
@@ -32,10 +36,13 @@ func TopicSlug(name string) string {
 
 func slugify(name string) string {
 	s := strings.ToLower(name)
-	s = strings.ReplaceAll(s, " ", "-")
 	s = strings.ReplaceAll(s, "ä", "ae")
 	s = strings.ReplaceAll(s, "ö", "oe")
 	s = strings.ReplaceAll(s, "ü", "ue")
 	s = strings.ReplaceAll(s, "ß", "ss")
+	s = strings.ReplaceAll(s, " ", "-")
+	s = nonAlphanumericHyphen.ReplaceAllString(s, "")
+	s = multipleHyphens.ReplaceAllString(s, "-")
+	s = strings.Trim(s, "-")
 	return s
 }

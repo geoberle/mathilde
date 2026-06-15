@@ -4,8 +4,8 @@ import "time"
 
 // Profile lives at users/{uid}/profile/main. Backend-owned.
 type Profile struct {
-	Mission     string            `firestore:"mission,omitempty"`
-	Preferences map[string]string `firestore:"preferences,omitempty"`
+	Mission     string            `firestore:"mission"`
+	Preferences map[string]string `firestore:"preferences"`
 }
 
 // Progress lives at users/{uid}/progress/main. Shell-owned.
@@ -18,8 +18,8 @@ type Progress struct {
 type Concept struct {
 	ID            string        `firestore:"id" json:"id"`
 	Name          string        `firestore:"name" json:"name"`
-	Prerequisites []string      `firestore:"prerequisites,omitempty" json:"prerequisites"`
-	Status        ConceptStatus `firestore:"status,omitempty" json:"status,omitempty"`
+	Prerequisites []string      `firestore:"prerequisites" json:"prerequisites"`
+	Status        ConceptStatus `firestore:"status" json:"status"`
 }
 
 // Topic lives at users/{uid}/topics/{id}.
@@ -54,12 +54,12 @@ const (
 // Session lives at users/{uid}/sessions/{id}.
 type Session struct {
 	TopicID    string        `firestore:"topicId"`
-	ConceptID  string        `firestore:"conceptId,omitempty"`
+	ConceptID  string        `firestore:"conceptId"`
 	Type       SessionType   `firestore:"type"`
 	Status     SessionStatus `firestore:"status"`
 	HTML       string        `firestore:"html"`
 	CreatedAt  time.Time     `firestore:"createdAt"`
-	ApprovedAt time.Time     `firestore:"approvedAt,omitempty"`
+	ApprovedAt time.Time     `firestore:"approvedAt"`
 	Order      int           `firestore:"order"`
 }
 
@@ -95,10 +95,10 @@ type LearningRecord struct {
 	ConceptID     string        `firestore:"conceptId"`
 	Status        ConceptStatus `firestore:"status"`
 	Narrative     string        `firestore:"narrative"`
-	LastPracticed time.Time     `firestore:"lastPracticed,omitempty"`
-	NextReview    time.Time     `firestore:"nextReview,omitempty"`
+	LastPracticed time.Time     `firestore:"lastPracticed"`
+	NextReview    time.Time     `firestore:"nextReview"`
 	Interval      int           `firestore:"interval"`
-	ErrorPatterns []string      `firestore:"errorPatterns,omitempty"`
+	ErrorPatterns []string      `firestore:"errorPatterns"`
 }
 
 // EvaluationStatus tracks the handwriting evaluation lifecycle.
@@ -113,9 +113,9 @@ const (
 type Evaluation struct {
 	ExerciseID string           `firestore:"exerciseId"`
 	SessionID  string           `firestore:"sessionId"`
-	ImageData  string           `firestore:"imageData,omitempty"`
+	ImageData  string           `firestore:"imageData"`
 	Status     EvaluationStatus `firestore:"status"`
-	Result     string           `firestore:"result,omitempty"`
+	Result     string           `firestore:"result"`
 	CreatedAt  time.Time        `firestore:"createdAt"`
 }
 

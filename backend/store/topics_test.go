@@ -13,6 +13,11 @@ func Test_slugify(t *testing.T) {
 		{name: "Flächen und Körper", want: "flaechen-und-koerper"},
 		{name: "Größen und Einheiten", want: "groessen-und-einheiten"},
 		{name: "Maße und Maßstäbe", want: "masse-und-massstaebe"},
+		{name: "Flächen & Körper", want: "flaechen-koerper"},
+		{name: "  spaces  ", want: "spaces"},
+		{name: "a--b", want: "a-b"},
+		{name: "ABC", want: "abc"},
+		{name: "", want: ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
