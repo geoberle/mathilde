@@ -65,7 +65,7 @@ func TestTopicRoundTrip(t *testing.T) {
 		AddedAt: time.Date(2026, 6, 14, 10, 0, 0, 0, time.UTC),
 	}
 
-	docID := slugify(want.Name)
+	docID := store.TopicSlug(want.Name)
 	doc := client.Collection("users").Doc(uid).Collection("topics").Doc(docID)
 	if _, err := doc.Set(ctx, want); err != nil {
 		t.Fatalf("writing topic: %v", err)
