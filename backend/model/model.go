@@ -12,9 +12,10 @@ type Profile struct {
 
 // Concept is an atomic learning unit within a Topic.
 type Concept struct {
-	ID            string   `firestore:"id"`
-	Name          string   `firestore:"name"`
-	Prerequisites []string `firestore:"prerequisites,omitempty"`
+	ID            string        `firestore:"id" json:"id"`
+	Name          string        `firestore:"name" json:"name"`
+	Prerequisites []string      `firestore:"prerequisites,omitempty" json:"prerequisites"`
+	Status        ConceptStatus `firestore:"status,omitempty" json:"status,omitempty"`
 }
 
 // Topic lives at users/{uid}/topics/{id}.
