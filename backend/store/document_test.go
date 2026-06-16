@@ -159,7 +159,7 @@ func TestReplaceNotFound(t *testing.T) {
 	doc := &store.Document[model.Profile]{
 		ID:         "main",
 		Data:       model.Profile{Mission: "Ghost"},
-		UpdateTime: time.Now(),
+		UpdateTime: time.Now().Truncate(time.Microsecond),
 	}
 
 	_, err := store.Replace(ctx, ref, doc)
