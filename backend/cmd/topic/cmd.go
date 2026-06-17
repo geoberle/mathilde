@@ -12,11 +12,9 @@ import (
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/spf13/cobra"
-	"google.golang.org/api/iterator"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/geoberle/mathilde/backend/model"
+	"github.com/geoberle/mathilde/backend/store"
 )
 
 func NewCommand() (*cobra.Command, error) {
@@ -93,9 +91,14 @@ func runAdd(ctx context.Context, opts *RawTopicOptions, name string) error {
 	}
 	defer completed.Close()
 
-	profile, err := readProfile(ctx, completed)
-	if err != nil {
+	profileDoc, err := completed.Store.GetProfile(ctx, completed.UID)
+	var profile *model.Profile
+	if errors.Is(err, store.ErrNotFound) {
+		profile = &model.Profile{}
+	} else if err != nil {
 		return fmt.Errorf("reading profile: %w", err)
+	} else {
+		profile = &profileDoc.Data
 	}
 
 	fmt.Printf("Generating concept breakdown for %q...\n", name)
@@ -111,10 +114,18 @@ func runAdd(ctx context.Context, opts *RawTopicOptions, name string) error {
 		AddedAt:  time.Now().UTC(),
 	}
 
-	docID := slugify(name)
-	doc := completed.Store.Doc(completed.UID, "topics", docID)
-	if _, err := doc.Set(ctx, topic); err != nil {
-		return fmt.Errorf("writing topic: %w", err)
+	existing, err := completed.Store.GetTopic(ctx, completed.UID, name)
+	if errors.Is(err, store.ErrNotFound) {
+		if _, err := completed.Store.CreateTopic(ctx, completed.UID, name, &topic); err != nil {
+			return fmt.Errorf("creating topic: %w", err)
+		}
+	} else if err != nil {
+		return fmt.Errorf("checking existing topic: %w", err)
+	} else {
+		existing.Data = topic
+		if _, err := completed.Store.ReplaceTopic(ctx, completed.UID, name, existing); err != nil {
+			return fmt.Errorf("replacing topic: %w", err)
+		}
 	}
 
 	fmt.Printf("Topic %q added with %d concepts:\n", name, len(concepts))
@@ -139,25 +150,16 @@ func runList(ctx context.Context, opts *RawTopicOptions) error {
 	}
 	defer completed.Close()
 
-	iter := completed.Store.Collection(completed.UID, "topics").Documents(ctx)
-	found := false
-	for {
-		snap, err := iter.Next()
-		if errors.Is(err, iterator.Done) {
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("reading topics: %w", err)
-		}
-		var t model.Topic
-		if err := snap.DataTo(&t); err != nil {
-			return fmt.Errorf("decoding topic %s: %w", snap.Ref.ID, err)
-		}
-		fmt.Printf("%-30s %d concepts\n", t.Name, len(t.Concepts))
-		found = true
+	topics, err := completed.Store.ListTopics(ctx, completed.UID)
+	if err != nil {
+		return fmt.Errorf("reading topics: %w", err)
 	}
-	if !found {
+	if len(topics) == 0 {
 		fmt.Println("No topics yet. Use 'mathilde topic add <name>' to add one.")
+		return nil
+	}
+	for _, doc := range topics {
+		fmt.Printf("%-30s %d concepts\n", doc.Data.Name, len(doc.Data.Concepts))
 	}
 	return nil
 }
@@ -173,12 +175,15 @@ func runShow(ctx context.Context, opts *RawTopicOptions, name string) error {
 	}
 	defer completed.Close()
 
-	topic, err := findTopicByName(ctx, completed, name)
+	doc, err := completed.Store.GetTopic(ctx, completed.UID, name)
+	if errors.Is(err, store.ErrNotFound) {
+		return fmt.Errorf("topic %q not found (looked up %q)", name, store.TopicSlug(name))
+	}
 	if err != nil {
 		return err
 	}
 
-	printTopicTree(os.Stdout, topic)
+	printTopicTree(os.Stdout, &doc.Data)
 	return nil
 }
 
@@ -206,45 +211,6 @@ func printTopicTree(w io.Writer, topic *model.Topic) {
 		}
 		fmt.Fprintln(w)
 	}
-}
-
-func readProfile(ctx context.Context, opts *TopicOptions) (*model.Profile, error) {
-	snap, err := opts.Store.ProfileDoc(opts.UID).Get(ctx)
-	if err != nil {
-		if status.Code(err) == codes.NotFound {
-			return &model.Profile{}, nil
-		}
-		return nil, fmt.Errorf("reading profile: %w", err)
-	}
-	var p model.Profile
-	if err := snap.DataTo(&p); err != nil {
-		return nil, fmt.Errorf("decoding profile: %w", err)
-	}
-	return &p, nil
-}
-
-func findTopicByName(ctx context.Context, opts *TopicOptions, name string) (*model.Topic, error) {
-	slug := slugify(name)
-	doc := opts.Store.Doc(opts.UID, "topics", slug)
-	snap, err := doc.Get(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("topic %q not found (looked up %q): %w", name, slug, err)
-	}
-	var t model.Topic
-	if err := snap.DataTo(&t); err != nil {
-		return nil, fmt.Errorf("decoding topic: %w", err)
-	}
-	return &t, nil
-}
-
-func slugify(name string) string {
-	s := strings.ToLower(name)
-	s = strings.ReplaceAll(s, " ", "-")
-	s = strings.ReplaceAll(s, "ä", "ae")
-	s = strings.ReplaceAll(s, "ö", "oe")
-	s = strings.ReplaceAll(s, "ü", "ue")
-	s = strings.ReplaceAll(s, "ß", "ss")
-	return s
 }
 
 const conceptPrompt = `Du bist ein erfahrener österreichischer Mathematiklehrer am Gymnasium.

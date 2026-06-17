@@ -79,8 +79,6 @@ func TestProfileRoundTrip(t *testing.T) {
 	ctx := context.Background()
 
 	want := model.Profile{
-		XP:      150,
-		Level:   3,
 		Mission: "Bruchrechnung vor der Schularbeit meistern",
 	}
 
@@ -102,13 +100,42 @@ func TestProfileRoundTrip(t *testing.T) {
 		t.Fatalf("decoding profile: %v", err)
 	}
 
+	if got.Mission != want.Mission {
+		t.Errorf("mission: got=%q want=%q", got.Mission, want.Mission)
+	}
+}
+
+func TestProgressRoundTrip(t *testing.T) {
+	client := newTestClient(t)
+	ctx := context.Background()
+
+	want := model.Progress{
+		XP:    150,
+		Level: 3,
+	}
+
+	doc := client.Collection("users").Doc("test-user").Collection("progress").Doc("main")
+	_, err := doc.Set(ctx, want)
+	if err != nil {
+		t.Fatalf("writing progress: %v", err)
+	}
+	defer func() { _, _ = doc.Delete(ctx) }()
+	defer client.Close()
+
+	snap, err := doc.Get(ctx)
+	if err != nil {
+		t.Fatalf("reading progress: %v", err)
+	}
+
+	var got model.Progress
+	if err := snap.DataTo(&got); err != nil {
+		t.Fatalf("decoding progress: %v", err)
+	}
+
 	if got.XP != want.XP {
 		t.Errorf("xp: got=%d want=%d", got.XP, want.XP)
 	}
 	if got.Level != want.Level {
 		t.Errorf("level: got=%d want=%d", got.Level, want.Level)
-	}
-	if got.Mission != want.Mission {
-		t.Errorf("mission: got=%q want=%q", got.Mission, want.Mission)
 	}
 }

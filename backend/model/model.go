@@ -2,20 +2,24 @@ package model
 
 import "time"
 
-// Profile is the single document at users/{uid}/profile/main.
+// Profile lives at users/{uid}/profile/main. Backend-owned.
 type Profile struct {
-	XP          int               `firestore:"xp"`
-	Level       int               `firestore:"level"`
 	Mission     string            `firestore:"mission,omitempty"`
 	Preferences map[string]string `firestore:"preferences,omitempty"`
+}
+
+// Progress lives at users/{uid}/progress/main. Shell-owned.
+type Progress struct {
+	XP    int `firestore:"xp"`
+	Level int `firestore:"level"`
 }
 
 // Concept is an atomic learning unit within a Topic.
 type Concept struct {
 	ID            string        `firestore:"id" json:"id"`
 	Name          string        `firestore:"name" json:"name"`
-	Prerequisites []string      `firestore:"prerequisites,omitempty" json:"prerequisites"`
-	Status        ConceptStatus `firestore:"status,omitempty" json:"status,omitempty"`
+	Prerequisites []string      `firestore:"prerequisites" json:"prerequisites"`
+	Status        ConceptStatus `firestore:"status" json:"status"`
 }
 
 // Topic lives at users/{uid}/topics/{id}.

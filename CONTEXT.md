@@ -14,6 +14,16 @@ _Avoid_: Admin, teacher, parent (in code context)
 The child who interacts with the app during practice sessions.
 _Avoid_: Student, user, kid
 
+### Learner State
+
+**Profile**:
+The Curator-managed configuration for a Learner — mission and preferences. Backend-owned, stored at `users/{uid}/profile/main`.
+_Avoid_: Settings, config, user record
+
+**Progress**:
+The Learner's earned XP and level. Shell-owned, stored at `users/{uid}/progress/main`. Can never decrease.
+_Avoid_: Stats, score, profile (which refers to the Curator-managed configuration)
+
 ### Pedagogy
 
 **Mission**:
@@ -85,6 +95,14 @@ _Avoid_: API, interface, callback
 **Shell**:
 The static SPA that handles auth, navigation, progress display, and renders Session HTML. Does not contain exercise logic — that lives in the generated HTML.
 _Avoid_: App, frontend, client
+
+### Data Principles
+
+**Document Ownership**:
+Every Firestore document has exactly one owning component that performs full-replace writes. Other components may read but never write. This eliminates merge conflicts and partial updates. Session documents are the exception — status transitions cross component boundaries and use conditional writes (UpdateTime precondition) for safety.
+
+**Document Identity**:
+Documents with natural keys use deterministic IDs: Topics use `slugify(name)`, Learning Records use `conceptId`, Profile and Progress use `main` (singletons). Documents without natural keys (Sessions, Evaluations) use auto-generated IDs.
 
 ## Relationships
 

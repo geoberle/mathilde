@@ -112,3 +112,14 @@ func TestProfileDoc(t *testing.T) {
 		t.Errorf("got path=%q, want suffix %q", got, wantSuffix)
 	}
 }
+
+func TestProgressDoc(t *testing.T) {
+	s := newPathTestStore(t)
+	uid := "test-user"
+
+	doc := s.ProgressDoc(uid)
+	wantSuffix := "users/" + uid + "/progress/main"
+	if got := doc.Path; len(got) < len(wantSuffix) || got[len(got)-len(wantSuffix):] != wantSuffix {
+		t.Errorf("got path=%q, want suffix %q", got, wantSuffix)
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/geoberle/mathilde/backend/model"
+	"github.com/geoberle/mathilde/backend/store"
 )
 
 func TestSlugify(t *testing.T) {
@@ -23,9 +24,9 @@ func TestSlugify(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got := slugify(tt.name)
+			got := store.TopicSlug(tt.name)
 			if got != tt.want {
-				t.Errorf("slugify(%q) = %q, want %q", tt.name, got, tt.want)
+				t.Errorf("store.TopicSlug(%q) = %q, want %q", tt.name, got, tt.want)
 			}
 		})
 	}

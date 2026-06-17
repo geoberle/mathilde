@@ -54,6 +54,11 @@ func (s *Store) ProfileDoc(uid string) *firestore.DocumentRef {
 	return s.UserDoc(uid).Collection("profile").Doc("main")
 }
 
+// ProgressDoc returns the progress document reference for a user.
+func (s *Store) ProgressDoc(uid string) *firestore.DocumentRef {
+	return s.UserDoc(uid).Collection("progress").Doc("main")
+}
+
 // Collection returns a collection reference under a user.
 func (s *Store) Collection(uid, name string) *firestore.CollectionRef {
 	return s.UserDoc(uid).Collection(name)

@@ -2,12 +2,13 @@ package mission
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	"cloud.google.com/go/firestore"
 	"github.com/spf13/cobra"
 
 	"github.com/geoberle/mathilde/backend/model"
+	"github.com/geoberle/mathilde/backend/store"
 )
 
 func NewCommand() (*cobra.Command, error) {
@@ -52,19 +53,19 @@ func runGet(ctx context.Context, opts *RawMissionOptions) error {
 	}
 	defer completed.Close()
 
-	snap, err := completed.Store.ProfileDoc(completed.UID).Get(ctx)
-	if err != nil {
-		return fmt.Errorf("reading profile: %w", err)
-	}
-	var p model.Profile
-	if err := snap.DataTo(&p); err != nil {
-		return fmt.Errorf("decoding profile: %w", err)
-	}
-	if len(p.Mission) == 0 {
+	doc, err := completed.Store.GetProfile(ctx, completed.UID)
+	if errors.Is(err, store.ErrNotFound) {
 		fmt.Println("No mission set.")
 		return nil
 	}
-	fmt.Println(p.Mission)
+	if err != nil {
+		return fmt.Errorf("reading profile: %w", err)
+	}
+	if len(doc.Data.Mission) == 0 {
+		fmt.Println("No mission set.")
+		return nil
+	}
+	fmt.Println(doc.Data.Mission)
 	return nil
 }
 
@@ -101,11 +102,19 @@ func runSet(ctx context.Context, opts *RawMissionOptions, text string) error {
 	}
 	defer completed.Close()
 
-	_, err = completed.Store.ProfileDoc(completed.UID).Set(ctx, map[string]any{
-		"mission": text,
-	}, firestore.MergeAll)
-	if err != nil {
-		return fmt.Errorf("setting mission: %w", err)
+	doc, err := completed.Store.GetProfile(ctx, completed.UID)
+	if errors.Is(err, store.ErrNotFound) {
+		profile := &model.Profile{Mission: text}
+		if _, err := completed.Store.CreateProfile(ctx, completed.UID, profile); err != nil {
+			return fmt.Errorf("creating profile: %w", err)
+		}
+	} else if err != nil {
+		return fmt.Errorf("reading profile: %w", err)
+	} else {
+		doc.Data.Mission = text
+		if _, err := completed.Store.ReplaceProfile(ctx, completed.UID, doc); err != nil {
+			return fmt.Errorf("updating profile: %w", err)
+		}
 	}
 	fmt.Println("Mission updated.")
 	return nil
