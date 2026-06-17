@@ -103,6 +103,7 @@ func Replace[T any](ctx context.Context, ref *firestore.DocumentRef, doc *Docume
 }
 
 // structToUpdates converts a struct with firestore tags to []firestore.Update.
+// Fields tagged with omitempty that have zero values are deleted from the document.
 func structToUpdates(v any) []firestore.Update {
 	val := reflect.ValueOf(v)
 	if val.Kind() == reflect.Pointer {
@@ -116,10 +117,18 @@ func structToUpdates(v any) []firestore.Update {
 		if len(tag) == 0 || tag == "-" {
 			continue
 		}
-		name, _, _ := strings.Cut(tag, ",")
+		name, opts, _ := strings.Cut(tag, ",")
+		fieldVal := val.Field(i)
+		if strings.Contains(opts, "omitempty") && fieldVal.IsZero() {
+			updates = append(updates, firestore.Update{
+				Path:  name,
+				Value: firestore.Delete,
+			})
+			continue
+		}
 		updates = append(updates, firestore.Update{
 			Path:  name,
-			Value: val.Field(i).Interface(),
+			Value: fieldVal.Interface(),
 		})
 	}
 	return updates

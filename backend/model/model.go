@@ -4,8 +4,8 @@ import "time"
 
 // Profile lives at users/{uid}/profile/main. Backend-owned.
 type Profile struct {
-	Mission     string            `firestore:"mission"`
-	Preferences map[string]string `firestore:"preferences"`
+	Mission     string            `firestore:"mission,omitempty"`
+	Preferences map[string]string `firestore:"preferences,omitempty"`
 }
 
 // Progress lives at users/{uid}/progress/main. Shell-owned.
@@ -54,12 +54,12 @@ const (
 // Session lives at users/{uid}/sessions/{id}.
 type Session struct {
 	TopicID    string        `firestore:"topicId"`
-	ConceptID  string        `firestore:"conceptId"`
+	ConceptID  string        `firestore:"conceptId,omitempty"`
 	Type       SessionType   `firestore:"type"`
 	Status     SessionStatus `firestore:"status"`
 	HTML       string        `firestore:"html"`
 	CreatedAt  time.Time     `firestore:"createdAt"`
-	ApprovedAt time.Time     `firestore:"approvedAt"`
+	ApprovedAt time.Time     `firestore:"approvedAt,omitempty"`
 	Order      int           `firestore:"order"`
 }
 
@@ -95,10 +95,10 @@ type LearningRecord struct {
 	ConceptID     string        `firestore:"conceptId"`
 	Status        ConceptStatus `firestore:"status"`
 	Narrative     string        `firestore:"narrative"`
-	LastPracticed time.Time     `firestore:"lastPracticed"`
-	NextReview    time.Time     `firestore:"nextReview"`
+	LastPracticed time.Time     `firestore:"lastPracticed,omitempty"`
+	NextReview    time.Time     `firestore:"nextReview,omitempty"`
 	Interval      int           `firestore:"interval"`
-	ErrorPatterns []string      `firestore:"errorPatterns"`
+	ErrorPatterns []string      `firestore:"errorPatterns,omitempty"`
 }
 
 // EvaluationStatus tracks the handwriting evaluation lifecycle.
@@ -113,9 +113,9 @@ const (
 type Evaluation struct {
 	ExerciseID string           `firestore:"exerciseId"`
 	SessionID  string           `firestore:"sessionId"`
-	ImageData  string           `firestore:"imageData"`
+	ImageData  string           `firestore:"imageData,omitempty"`
 	Status     EvaluationStatus `firestore:"status"`
-	Result     string           `firestore:"result"`
+	Result     string           `firestore:"result,omitempty"`
 	CreatedAt  time.Time        `firestore:"createdAt"`
 }
 
