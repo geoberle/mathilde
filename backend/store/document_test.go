@@ -162,9 +162,11 @@ func TestReplaceNotFound(t *testing.T) {
 		UpdateTime: time.Now().Truncate(time.Microsecond),
 	}
 
+	// Firestore returns FailedPrecondition (not NotFound) when a
+	// LastUpdateTime precondition is set on a non-existent document.
 	_, err := store.Replace(ctx, ref, doc)
-	if !errors.Is(err, store.ErrNotFound) {
-		t.Fatalf("expected ErrNotFound, got: %v", err)
+	if !errors.Is(err, store.ErrConflict) {
+		t.Fatalf("expected ErrConflict, got: %v", err)
 	}
 }
 
